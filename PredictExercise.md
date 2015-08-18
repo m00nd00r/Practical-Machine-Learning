@@ -299,15 +299,15 @@ pred1<-predict(fit1,pmltest)
 ```
 
 ```
-## Warning: closing unused connection 10 (<-act2.mediafour.com:11714)
+## Warning: closing unused connection 7 (<-act2.mediafour.com:11714)
 ```
 
 ```
-## Warning: closing unused connection 9 (<-act2.mediafour.com:11714)
+## Warning: closing unused connection 6 (<-act2.mediafour.com:11714)
 ```
 
 ```
-## Warning: closing unused connection 8 (<-act2.mediafour.com:11714)
+## Warning: closing unused connection 5 (<-act2.mediafour.com:11714)
 ```
 
 ```r

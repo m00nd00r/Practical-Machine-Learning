@@ -66,7 +66,21 @@ Let's look to see if there's anything zero or near-zero variance predictors. Not
 
 ```r
 nzv<-nearZeroVar(pmldata[,-53])
+```
 
+```
+## Warning: closing unused connection 7 (<-act2.mediafour.com:11714)
+```
+
+```
+## Warning: closing unused connection 6 (<-act2.mediafour.com:11714)
+```
+
+```
+## Warning: closing unused connection 5 (<-act2.mediafour.com:11714)
+```
+
+```r
 nzv
 ```
 
@@ -289,9 +303,9 @@ fit2; plot(fit2)
 
 ## Results
 
-As you can see from these results, fit1 does slightly better than fit2. Not what I expected: apparently leaving in more variables allows the boosting method to do a better a job.
+As you can see from these results, fit1 does slightly better than fit2. Leaving in more variables allows the boosting method to do a better a job.
 
-Here are the confusion matrices to see how well each performs. Again, predictions from fit1 do a bit better.
+Here are the confusion matrices to see how well each performs. Again, predictions from fit1 do a bit better. I've also include the missclassification rate
 
 
 ```r
@@ -370,6 +384,26 @@ confusionMatrix(pred2,pmltest2$classe)
 ## Detection Rate         0.2800   0.1815   0.1660   0.1568   0.1766
 ## Detection Prevalence   0.2865   0.1935   0.1772   0.1623   0.1805
 ## Balanced Accuracy      0.9877   0.9614   0.9693   0.9755   0.9777
+```
+
+```r
+#to get an out of sample missclassification error rate:
+
+1 - confusionMatrix(pred1,pmltest$classe)$overall[1]
+```
+
+```
+##   Accuracy 
+## 0.03483432
+```
+
+```r
+1 - confusionMatrix(pred2,pmltest2$classe)$overall[1]
+```
+
+```
+##   Accuracy 
+## 0.03908241
 ```
 
 Here, I finally run the predictions on the the final testing data for submission. As you can see there is no difference between the two.

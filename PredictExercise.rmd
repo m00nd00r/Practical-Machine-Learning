@@ -1,0 +1,211 @@
+---
+title: "Bicep Curl Performance Classification Prediction "
+author: "John Kinstler"
+output: html_document
+---
+
+## Executive Summary
+
+From a report called the "Qualitative Activity Recognition of Weight Lifting Exercises" by a group of Brazilian researches, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.
+
+For this analysis, I will model the data provided to predict which type of curl was performed based on the data collected from 4 different sensors applied to the test subjects' body.
+
+There are two data sets provided. The first will be used to train and test a model. This data set has 159 different variables collected about the subjects and their sensor output along with the type of curl they performed.
+
+The second data set has the same variables excluding the curl type with only 20 total observations. This will be used as the final test set to generate a prediction set to be used for grading.
+
+## Analysis
+
+First, read in the data set. Then I want to narrow down the variables to use in training the model, since so many of them are largely composed of NAs as well as blank spaces. Also, the first 7 columns don't appear to be very useful in predicting the type of exercise so I'll leave those out as well.
+
+pmldata is my training set from which I will also create a cross-validation set. pmltesting is my final submission data set that I will run my final model on for submitting for class credit.
+
+Everything I do to the training set I will do to my submittal set as well.
+
+```{r message=FALSE, echo=FALSE}
+
+library(caret); library(doParallel)
+
+#to speed up execution of the model fits
+registerDoParallel()
+
+```
+
+
+
+```{r message=FALSE, cache=TRUE}
+
+pmldata <- read.csv("pml-training.csv",stringsAsFactors=FALSE)
+pmlfinaltest <- read.csv("pml-testing.csv",stringsAsFactors=FALSE)
+
+
+# subtract off 1st 7 cols
+pmldata <- pmldata[, -c(1:7)]   
+pmlfinaltest <- pmlfinaltest[, -c(1:7)]
+
+
+#remove cols with any NAs
+pmldata <- pmldata[, colSums(is.na(pmldata)) == 0]   
+pmlfinaltest <- pmlfinaltest[, colSums(is.na(pmlfinaltest)) == 0]
+
+
+#remove cols with any blank spaces
+pmldata <- pmldata[, colSums(pmldata == "") == 0]   
+pmlfinaltest <- pmlfinaltest[, colSums(pmlfinaltest == "") == 0]
+
+dim(pmldata); dim(pmlfinaltest)
+
+
+```
+
+
+Now, I want to try some pre-processing to see if there's anything to be gained by dropping more variables. Since all of the variables are continuous numbers, I won't need to use any dummy variables; only the outcome, classe, is a factor.
+
+Let's look to see if there's anything zero or near-zero variance predictors. Not a big deal for tree-based models, which I will focus on here, but it's easy to check.
+
+
+```{r}
+
+nzv<-nearZeroVar(pmldata[,-53])
+
+nzv
+
+```
+
+So, no problems there. Now, let's see if there are any variables that are highly correlated, thus making them redundant.
+
+First, I'll create the correlation matrix for pmltrain[,-53]. (Just removing the outcome, classe, column(53) for the purpose of these pre-processing functions.) Then I'll run the findCorrelation function to see which variables I might remove.
+
+
+
+```{r}
+
+corpml <- cor(pmldata[,-53])
+
+highcor <- findCorrelation(corpml)
+
+highcor
+
+```
+
+Alright, so here's a list of 7 candidates for removal. I'll create two separate train/test data sets to compare: one with and without these correlated variables.
+
+
+```{r}
+
+pmldata2 <- pmldata[, -highcor]
+pmlfinaltest2 <- pmlfinaltest[, -highcor]
+
+dim(pmldata2); dim(pmlfinaltest2)
+
+```
+
+
+
+Next, I'll split both of the training data sets into training and testing sets for cross-validation. pmlfinaltest and pmlfinaltest2 will only be used for final submission as they don't have the classe variable included
+
+```{r message=TRUE, cache=TRUE}
+set.seed(1234)
+
+intrain <- createDataPartition(y=pmldata$classe, p = 0.7, list = FALSE)
+
+pmltrain <- pmldata[intrain,]
+
+pmltest <- pmldata[-intrain,]
+
+set.seed(1234)
+
+intrain <- createDataPartition(y=pmldata2$classe, p = 0.7, list = FALSE)
+
+pmltrain2 <- pmldata2[intrain,]
+
+pmltest2 <- pmldata2[-intrain,]
+
+
+dim(pmltrain); dim(pmltest); dim(pmltrain2); dim(pmltest2)
+
+```
+
+
+On my own I tested a few different models and discovered that the out-of-the-box gbm method using all the defaults gave me the best results. So I'll run gbm on each of these two training sets to see the results.
+
+
+```{r message=FALSE, fig.width=7}
+
+tc<-trainControl(allowParallel=TRUE)
+
+set.seed(1234)
+
+fit1file<-"modelfit1.rds"
+
+if(file.exists(fit1file)){
+        
+        fit1<-readRDS(fit1file)
+        
+} else {
+        
+        fit1<-train(factor(classe)~.,data=pmltrain, method = "gbm", verbose=FALSE, trControl=tc)
+        
+        saveRDS(fit1,"modelfit1.rds")
+}
+
+fit1; plot(fit1)
+
+```
+
+
+```{r message=FALSE, fig.width=7}
+
+set.seed(1234)
+
+fit2file<-"modelfit2.rds"
+
+if(file.exists(fit2file)){
+        
+        fit2<-readRDS(fit2file)
+        
+} else {
+        
+        fit2<-train(factor(classe)~.,data=pmltrain2, method = "gbm", verbose=FALSE, trControl=tc)
+        
+        saveRDS(fit2,"modelfit2.rds")
+}
+
+fit2; plot(fit2)
+
+```
+
+## Results
+
+As you can see from these results, fit1 does slightly better than fit2. Leaving in more variables allows the boosting method to do a better a job.
+
+Here are the confusion matrices to see how well each performs. Again, predictions from fit1 do a bit better. I've also include the missclassification rate
+
+```{r message=FALSE}
+
+pred1<-predict(fit1,pmltest)
+confusionMatrix(pred1,pmltest$classe)
+
+pred2<-predict(fit2,pmltest2)
+confusionMatrix(pred2,pmltest2$classe)
+
+#to get an out of sample missclassification error rate:
+
+1 - confusionMatrix(pred1,pmltest$classe)$overall[1]
+1 - confusionMatrix(pred2,pmltest2$classe)$overall[1]
+
+```
+
+Here, I finally run the predictions on the the final testing data for submission. As you can see there is no difference between the two.
+
+According to the submission results, all of these results are correct. I would seem then that Stochastic Gradient Boosting with it's default parameters is pretty good model to use for predicting large variable datasets like this.
+
+```{r message=FALSE}
+
+finalpred1<-predict(fit1,pmlfinaltest)
+finalpred2<-predict(fit2,pmlfinaltest2)
+
+finalpred1;finalpred2
+
+```
+

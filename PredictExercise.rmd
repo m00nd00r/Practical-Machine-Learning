@@ -6,7 +6,7 @@ output: html_document
 
 ## Executive Summary
 
-From a report called the "Qualitative Activity Recognition of Weight Lifting Exercises" by a group of Brazilian researches, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.
+From a report called the "Qualitative Activity Recognition of Weight Lifting Exercises" by a group of Brazilian researchers, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.
 
 For this analysis, I will model the data provided to predict which type of curl was performed based on the data collected from 4 different sensors applied to the test subjects' body.
 
@@ -64,7 +64,7 @@ Now, I want to try some pre-processing to see if there's anything to be gained b
 Let's look to see if there's anything zero or near-zero variance predictors. Not a big deal for tree-based models, which I will focus on here, but it's easy to check.
 
 
-```{r}
+```{r message=FALSE}
 
 nzv<-nearZeroVar(pmldata[,-53])
 

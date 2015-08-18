@@ -203,7 +203,7 @@ hr {
 <body>
 <h2>Executive Summary</h2>
 
-<p>From a report called the &ldquo;Qualitative Activity Recognition of Weight Lifting Exercises&rdquo; by a group of Brazilian researches, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.</p>
+<p>From a report called the &ldquo;Qualitative Activity Recognition of Weight Lifting Exercises&rdquo; by a group of Brazilian researchers, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.</p>
 
 <p>For this analysis, I will model the data provided to predict which type of curl was performed based on the data collected from 4 different sensors applied to the test subjects&#39; body.</p>
 
@@ -251,18 +251,8 @@ dim(pmldata); dim(pmlfinaltest)
 <p>Let&#39;s look to see if there&#39;s anything zero or near-zero variance predictors. Not a big deal for tree-based models, which I will focus on here, but it&#39;s easy to check.</p>
 
 <pre><code class="r">nzv&lt;-nearZeroVar(pmldata[,-53])
-</code></pre>
 
-<pre><code>## Warning: closing unused connection 7 (&lt;-act2.mediafour.com:11714)
-</code></pre>
-
-<pre><code>## Warning: closing unused connection 6 (&lt;-act2.mediafour.com:11714)
-</code></pre>
-
-<pre><code>## Warning: closing unused connection 5 (&lt;-act2.mediafour.com:11714)
-</code></pre>
-
-<pre><code class="r">nzv
+nzv
 </code></pre>
 
 <pre><code>## integer(0)
@@ -461,7 +451,18 @@ fit2; plot(fit2)
 <p>Here are the confusion matrices to see how well each performs. Again, predictions from fit1 do a bit better. I&#39;ve also include the missclassification rate</p>
 
 <pre><code class="r">pred1&lt;-predict(fit1,pmltest)
-confusionMatrix(pred1,pmltest$classe)
+</code></pre>
+
+<pre><code>## Warning: closing unused connection 10 (&lt;-act2.mediafour.com:11714)
+</code></pre>
+
+<pre><code>## Warning: closing unused connection 9 (&lt;-act2.mediafour.com:11714)
+</code></pre>
+
+<pre><code>## Warning: closing unused connection 8 (&lt;-act2.mediafour.com:11714)
+</code></pre>
+
+<pre><code class="r">confusionMatrix(pred1,pmltest$classe)
 </code></pre>
 
 <pre><code>## Confusion Matrix and Statistics

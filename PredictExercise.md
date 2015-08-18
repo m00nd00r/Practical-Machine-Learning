@@ -6,7 +6,7 @@ output: html_document
 
 ## Executive Summary
 
-From a report called the "Qualitative Activity Recognition of Weight Lifting Exercises" by a group of Brazilian researches, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.
+From a report called the "Qualitative Activity Recognition of Weight Lifting Exercises" by a group of Brazilian researchers, we get a data set that distinguishes 5 styles of curling a dumbbell, 1 of which is qualitatively correct with the remaining 4 showcasing typical mistakes people make when performing this exercise.
 
 For this analysis, I will model the data provided to predict which type of curl was performed based on the data collected from 4 different sensors applied to the test subjects' body.
 
@@ -66,21 +66,7 @@ Let's look to see if there's anything zero or near-zero variance predictors. Not
 
 ```r
 nzv<-nearZeroVar(pmldata[,-53])
-```
 
-```
-## Warning: closing unused connection 7 (<-act2.mediafour.com:11714)
-```
-
-```
-## Warning: closing unused connection 6 (<-act2.mediafour.com:11714)
-```
-
-```
-## Warning: closing unused connection 5 (<-act2.mediafour.com:11714)
-```
-
-```r
 nzv
 ```
 
@@ -310,6 +296,21 @@ Here are the confusion matrices to see how well each performs. Again, prediction
 
 ```r
 pred1<-predict(fit1,pmltest)
+```
+
+```
+## Warning: closing unused connection 10 (<-act2.mediafour.com:11714)
+```
+
+```
+## Warning: closing unused connection 9 (<-act2.mediafour.com:11714)
+```
+
+```
+## Warning: closing unused connection 8 (<-act2.mediafour.com:11714)
+```
+
+```r
 confusionMatrix(pred1,pmltest$classe)
 ```
 
